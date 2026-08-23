@@ -1,9 +1,14 @@
 // lib/embeddings.ts
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Falta configurar OPENAI_API_KEY en las variables de entorno");
+  }
+
+  return new OpenAI({ apiKey });
+}
 
 const EMBEDDING_MODEL = "text-embedding-3-small"; // 1536 dimensiones
 const MAX_BATCH_SIZE = 100; // límite prudente por request (OpenAI soporta más, pero esto evita payloads gigantes)
@@ -20,6 +25,7 @@ export interface EmbeddingResult {
 export async function generateEmbeddings(
   texts: string[]
 ): Promise<EmbeddingResult[]> {
+  const openai = getOpenAIClient();
   const results: EmbeddingResult[] = [];
 
   for (let i = 0; i < texts.length; i += MAX_BATCH_SIZE) {
@@ -45,6 +51,7 @@ export async function generateEmbeddings(
  * Genera el embedding de un solo texto (ej. la pregunta del usuario en /api/chat).
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
+  const openai = getOpenAIClient();
   const response = await openai.embeddings.create({
     model: EMBEDDING_MODEL,
     input: text,

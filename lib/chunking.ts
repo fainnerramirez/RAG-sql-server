@@ -1,4 +1,4 @@
-import { get_encoding } from "tiktoken";
+import { getEncoding } from "js-tiktoken";
 
 export interface Chunk {
   content: string;
@@ -11,7 +11,7 @@ interface ChunkOptions {
   overlap?: number;      // tokens de solapamiento entre chunks
 }
 
-const encoding = get_encoding("cl100k_base"); // encoding usado por text-embedding-3-* y gpt-4o
+const encoding = getEncoding("cl100k_base"); // encoding usado por text-embedding-3-* y gpt-4o
 
 export function chunkText(
   text: string,
@@ -32,7 +32,7 @@ export function chunkText(
     const end = Math.min(start + chunkSize, tokens.length);
     const chunkTokens = tokens.slice(start, end);
 
-    const decoded = new TextDecoder().decode(encoding.decode(chunkTokens));
+    const decoded = encoding.decode(chunkTokens);
 
     chunks.push({
       content: decoded.trim(),

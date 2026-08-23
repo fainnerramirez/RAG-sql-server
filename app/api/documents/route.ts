@@ -30,10 +30,11 @@ async function extractText(file: File): Promise<string> {
 }
 
 export async function POST(req: NextRequest) {
-  const pool = await getPool();
+  let pool: Awaited<ReturnType<typeof getPool>> | undefined;
   let documentId: number | undefined;
 
   try {
+    pool = await getPool();
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
 
@@ -109,11 +110,15 @@ export async function POST(req: NextRequest) {
     console.error("Error procesando documento:", error);
 
     // Si ya se había creado el registro del documento, márcalo como error
-    if (documentId) {
-      await pool
-        .request()
-        .input("documentId", sql.Int, documentId)
-        .query(`UPDATE Documents SET Status = 'error' WHERE Id = @documentId;`);
+    if (documentId && pool) {
+      try {
+        await pool
+          .request()
+          .input("documentId", sql.Int, documentId)
+          .query(`UPDATE Documents SET Status = 'error' WHERE Id = @documentId;`);
+      } catch (statusError) {
+        console.error("Error actualizando el estado del documento:", statusError);
+      }
     }
 
     return Response.json(
@@ -125,11 +130,19 @@ export async function POST(req: NextRequest) {
 
 // Endpoint auxiliar para listar documentos (útil para el UploadPanel del frontend)
 export async function GET() {
-  const pool = await getPool();
-  const result = await pool.request().query(`
-    SELECT Id, FileName, FileType, Status, UploadedAt
-    FROM Documents
-    ORDER BY UploadedAt DESC;
-  `);
-  return Response.json(result.recordset);
+  try {
+    const pool = await getPool();
+    const result = await pool.request().query(`
+      SELECT Id, FileName, FileType, Status, UploadedAt
+      FROM Documents
+      ORDER BY UploadedAt DESC;
+    `);
+    return Response.json(result.recordset);
+  } catch (error) {
+    console.error("Error cargando documentos:", error);
+    return Response.json(
+      { error: error instanceof Error ? error.message : "Error desconocido" },
+      { status: 500 }
+    );
+  }
 }
