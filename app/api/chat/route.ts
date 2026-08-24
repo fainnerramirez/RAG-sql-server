@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
   const pool = await getPool();
 
   // 1. Retrieval
-  const chunks = await retrieveRelevantChunks(message, { topK: 5, maxDistance: 0.5 });
+  const chunks = await retrieveRelevantChunks(message, { topK: 5 });
+  console.log("Distances: ", chunks.map((c) => ({ fileName: c.fileName, distance: c.distance })));
   const context = buildContextBlock(chunks);
 
   // 2. Guardar el mensaje del usuario en el historial
