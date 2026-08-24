@@ -2,14 +2,14 @@
 import sql from "mssql";
 
 const config: sql.config = {
-  server: process.env.DB_SERVER!,        // ej: "localhost" o "tu-servidor.database.windows.net"
-  database: process.env.DB_DATABASE!,        // "RagLearningDb"
-  user: process.env.DB_USER!,            // "sa" o tu usuario
-  password: process.env.DB_PASSWORD!,  // Reemplaza con tu contraseña real
+  server: process.env.DB_SERVER!,        
+  database: process.env.DB_DATABASE!,   
+  user: process.env.DB_USER!,            
+  password: process.env.DB_PASSWORD!, 
   port: 1433,
   options: {
-    encrypt: true,                        // true si usas Azure SQL o SQL Server con TLS
-    trustServerCertificate: true,         // true solo en desarrollo local
+    encrypt: true,                        
+    trustServerCertificate: true,        
   },
   pool: {
     max: 10,
@@ -18,9 +18,7 @@ const config: sql.config = {
   },
 };
 
-// Evita crear múltiples pools durante hot-reload en desarrollo (App Router)
 declare global {
-  // eslint-disable-next-line no-var
   var _sqlPool: sql.ConnectionPool | undefined;
 }
 

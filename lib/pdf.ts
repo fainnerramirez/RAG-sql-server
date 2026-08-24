@@ -1,4 +1,3 @@
-// lib/pdf.ts
 import { extractText, getDocumentProxy } from "unpdf";
 
 export async function extractPdfText(buffer: Buffer): Promise<string> {
