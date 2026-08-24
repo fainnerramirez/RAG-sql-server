@@ -115,10 +115,6 @@ DB_PORT=1433
 OPENAI_API_KEY=tu_clave_de_openai
 ```
 
-La variable del nombre de base de datos debe ser `DB_DATABASE`, que es la que consume `lib/db.ts`. La aplicación usa autenticación SQL Server (`DB_USER` y `DB_PASSWORD`); una cadena .NET con `Trusted_Connection=True` usa autenticación de Windows y no es equivalente.
-
-No subas `.env.local` al repositorio ni expongas las claves en código cliente. Si una clave apareció en logs o conversaciones, revócala y genera otra.
-
 ## Instalación y ejecución
 
 ```powershell
