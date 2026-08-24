@@ -138,7 +138,7 @@ export default function ChatWindow({ onSourcesUpdate }: ChatWindowProps) {
         />
         <button
           onClick={sendMessage}
-          disabled={isStreaming || !input.trim()}
+          // disabled={isStreaming || !input.trim()}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-40"
         >
           Enviar

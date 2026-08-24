@@ -1,9 +1,11 @@
 // app/api/documents/route.ts
 import { NextRequest } from "next/server";
+import { pathToFileURL } from "node:url";
 import sql from "mssql";
 import { getPool } from "@/lib/db";
 import { chunkText } from "@/lib/chunking";
 import { generateEmbeddings, embeddingToSqlJson } from "@/lib/embeddings";
+import { extractPdfText } from "@/lib/pdf";
 
 export const runtime = "nodejs"; // pdf-parse necesita Node.js runtime, no Edge
 
@@ -12,14 +14,7 @@ async function extractText(file: File): Promise<string> {
   const extension = file.name.split(".").pop()?.toLowerCase();
 
   if (extension === "pdf") {
-    const { PDFParse } = await import("pdf-parse");
-    const parser = new PDFParse({ data: buffer });
-    try {
-      const parsed = await parser.getText();
-      return parsed.text;
-    } finally {
-      await parser.destroy();
-    }
+    return extractPdfText(buffer);
   }
 
   if (extension === "txt" || extension === "md") {
@@ -34,6 +29,7 @@ export async function POST(req: NextRequest) {
   let documentId: number | undefined;
 
   try {
+
     pool = await getPool();
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
